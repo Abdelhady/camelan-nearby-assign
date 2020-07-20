@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.camelan_nearby_assign">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Only forground location is needed ; https://developer.android.com/training/location/permissions#foreground -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
