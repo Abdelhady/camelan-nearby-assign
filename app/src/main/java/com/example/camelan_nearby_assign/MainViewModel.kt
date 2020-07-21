@@ -6,5 +6,6 @@ import androidx.lifecycle.ViewModel
 class MainViewModel: ViewModel() {
 
     var hasPermission = MutableLiveData<Boolean>(false)
+    var locationSettingEnabled = MutableLiveData<Boolean>(false)
 
 }

@@ -47,13 +47,15 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
 
-    // *** utils
+    // *** needed libraries
     implementation 'com.jakewharton.timber:timber:4.7.1'
     // https://developer.android.com/kotlin/ktx#fragment (specially binding viewModels in one-line
     implementation 'androidx.fragment:fragment-ktx:1.2.5'
     // To call Activity.startActivityForResult(Intent, int)-style APIs without having to manage request codes ; https://developer.android.com/training/basics/intents/result
     implementation "androidx.activity:activity-ktx:1.2.0-alpha06"
     implementation "androidx.fragment:fragment-ktx:1.3.0-alpha06"
+    // To request location; https://developer.android.com/training/location/retrieve-current#setup
+    implementation "com.google.android.gms:play-services-location:17.0.0"
 
     // *** Testing
     testImplementation 'junit:junit:4.12'
