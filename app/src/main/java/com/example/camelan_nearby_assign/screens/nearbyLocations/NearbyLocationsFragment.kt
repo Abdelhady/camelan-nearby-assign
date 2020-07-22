@@ -11,9 +11,13 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.camelan_nearby_assign.MyApp
 import com.example.camelan_nearby_assign.R
+import com.example.camelan_nearby_assign.ui.VenuesAdapter
 import com.google.android.gms.location.*
+import kotlinx.android.synthetic.main.nearby_locations_fragment.*
 import timber.log.Timber
 
 class NearbyLocationsFragment : Fragment() {
@@ -23,6 +27,7 @@ class NearbyLocationsFragment : Fragment() {
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var currentLocation: Location
+    private val adapter = VenuesAdapter()
 
     companion object {
         fun newInstance() =
@@ -46,8 +51,21 @@ class NearbyLocationsFragment : Fragment() {
             .create()
             .inject(viewModel)
 
-        fetchLastKnownLocation()
+        fetchLastKnownLocation() // TODO most of the time, it returns null, is it worth using after all !
+        initLocationListener()
+        initVenuesList()
+    }
 
+    private fun initVenuesList() {
+        venuesRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
+        venuesRecyclerView.adapter = adapter
+        viewModel.venueItems.observe(requireActivity()) {
+            Timber.d("location: new venues has arrived to fragment, with size: ${it.size}")
+            adapter.items = it.toMutableList()
+        }
+    }
+
+    private fun initLocationListener() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return

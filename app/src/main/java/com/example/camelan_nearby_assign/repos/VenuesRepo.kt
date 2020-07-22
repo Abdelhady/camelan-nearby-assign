@@ -15,8 +15,7 @@ class VenuesRepo @Inject constructor(
     private val venuesService: FoursquareVenuesService
 ) {
 
-    fun getNearbyVenues(latitude: Double, longitude: Double, radius: Int): LiveData<List<Venue>> {
-        val data = MutableLiveData<List<Venue>>()
+    fun getNearbyVenues(latitude: Double, longitude: Double, radius: Int, successCallback: (List<Venue>)-> Unit){
         val ll = "${latitude},${longitude}"
         venuesService.getNearbyVenues(ll, radius)
             .enqueue(object : Callback<ExploreResponse> {
@@ -41,11 +40,10 @@ class VenuesRepo @Inject constructor(
                             Timber.d("location: venue name: ${item.venue.name}")
                         }
                     }
-                    data.value = venues.toList()
+                    successCallback(venues.toList())
                 }
 
             })
-        return data
     }
 
 }
