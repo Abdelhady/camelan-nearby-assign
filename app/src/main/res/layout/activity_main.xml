@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.camelan_nearby_assign.MainViewModel" />
+            type="com.example.camelan_nearby_assign.screens.nearbyLocations.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +15,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".screens.nearbyLocations.MainActivity">
 
         <TextView
             android:id="@+id/permissionNoteTextView"

@@ -1,4 +1,4 @@
-package com.example.camelan_nearby_assign
+package com.example.camelan_nearby_assign.screens.nearbyLocations
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

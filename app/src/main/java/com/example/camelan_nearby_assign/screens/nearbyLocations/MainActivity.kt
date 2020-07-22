@@ -1,4 +1,4 @@
-package com.example.camelan_nearby_assign
+package com.example.camelan_nearby_assign.screens.nearbyLocations
 
 import android.Manifest
 import android.app.Activity
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.observe
+import com.example.camelan_nearby_assign.R
 import com.example.camelan_nearby_assign.databinding.ActivityMainBinding
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -45,7 +46,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding =
-            DataBindingUtil.setContentView(this, R.layout.activity_main)
+            DataBindingUtil.setContentView(this,
+                R.layout.activity_main
+            )
         binding.viewmodel = mainViewModel
         binding.lifecycleOwner = this
         if (!mainViewModel.hasPermission.value!!) {
@@ -93,7 +96,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNearbyFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, NearbyLocationsFragment())
+            .add(
+                R.id.fragmentContainer,
+                NearbyLocationsFragment()
+            )
             .commitAllowingStateLoss()
     }
 

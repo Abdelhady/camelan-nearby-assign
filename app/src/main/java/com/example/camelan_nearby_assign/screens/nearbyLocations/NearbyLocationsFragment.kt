@@ -1,4 +1,4 @@
-package com.example.camelan_nearby_assign
+package com.example.camelan_nearby_assign.screens.nearbyLocations
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.camelan_nearby_assign.MyApp
+import com.example.camelan_nearby_assign.R
 import com.google.android.gms.location.*
 import timber.log.Timber
 
@@ -23,7 +25,8 @@ class NearbyLocationsFragment : Fragment() {
     private lateinit var currentLocation: Location
 
     companion object {
-        fun newInstance() = NearbyLocationsFragment()
+        fun newInstance() =
+            NearbyLocationsFragment()
     }
 
     val viewModel by activityViewModels<NearbyLocationsViewModel>()
@@ -38,6 +41,11 @@ class NearbyLocationsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // TODO: Use the ViewModel
+        (activity?.application as MyApp).appComponent
+            .nearbyLocationsComponent()
+            .create()
+            .inject(viewModel)
+
         fetchLastKnownLocation()
 
         locationCallback = object : LocationCallback() {
@@ -48,6 +56,7 @@ class NearbyLocationsFragment : Fragment() {
                 currentLocation = locationResult.locations[0]
                 Timber.d("current location details .. Longitude: ${currentLocation.longitude}, Latitude: ${currentLocation.latitude}")
                 // TODO refresh nearby locations list here
+                viewModel.refreshPlaces(currentLocation.latitude, currentLocation.longitude)
             }
         }
     }
