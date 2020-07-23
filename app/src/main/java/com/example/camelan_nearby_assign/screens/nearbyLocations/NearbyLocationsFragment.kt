@@ -60,6 +60,7 @@ class NearbyLocationsFragment : Fragment() {
     private fun initVenuesList() {
         venuesRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         venuesRecyclerView.adapter = adapter
+        adapter.myApp = activity?.application as MyApp // For di injection
         venuesRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 requireActivity(),

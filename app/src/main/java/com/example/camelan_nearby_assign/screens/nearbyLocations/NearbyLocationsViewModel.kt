@@ -20,7 +20,7 @@ class NearbyLocationsViewModel : ViewModel() {
             for (venue in it) {
                 val category = venue.categories?.get(0)?.name + " - "
                 val address = venue.location.formattedAddress.joinToString(", ")
-                items.add(VenueItem(venue.name, category + address, ""))
+                items.add(VenueItem(venue.id, venue.name, category + address, ""))
             }
             value = items.toList()
         }

@@ -1,7 +1,5 @@
 package com.example.camelan_nearby_assign.repos
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.camelan_nearby_assign.dataSource.FoursquareVenuesService
 import com.example.camelan_nearby_assign.dataSource.model.ExploreResponse
 import com.example.camelan_nearby_assign.dataSource.model.Venue
@@ -15,7 +13,12 @@ class VenuesRepo @Inject constructor(
     private val venuesService: FoursquareVenuesService
 ) {
 
-    fun getNearbyVenues(latitude: Double, longitude: Double, radius: Int, successCallback: (List<Venue>)-> Unit){
+    fun getNearbyVenues(
+        latitude: Double,
+        longitude: Double,
+        radius: Int,
+        successCallback: (List<Venue>) -> Unit
+    ) {
         val ll = "${latitude},${longitude}"
         venuesService.getNearbyVenues(ll, radius)
             .enqueue(object : Callback<ExploreResponse> {
@@ -35,7 +38,7 @@ class VenuesRepo @Inject constructor(
                     val items = response.body()?.response?.groups?.get(0)?.items
                     var venues = arrayListOf<Venue>()
                     if (items != null) {
-                        for (item in items){
+                        for (item in items) {
                             venues.add(item.venue)
                             Timber.d("location: venue name: ${item.venue.name}")
                         }

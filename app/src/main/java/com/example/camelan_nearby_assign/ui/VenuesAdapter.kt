@@ -3,8 +3,14 @@ package com.example.camelan_nearby_assign.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.camelan_nearby_assign.MyApp
+import com.example.camelan_nearby_assign.R
 import com.example.camelan_nearby_assign.databinding.VenueItemBinding
+import com.example.camelan_nearby_assign.services.PhotosService
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.venue_item.view.*
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * https://www.untitledkingdom.com/blog/refactoring-recyclerview-adapter-to-data-binding-5631f239095f-0
@@ -12,6 +18,7 @@ import timber.log.Timber
  */
 class VenuesAdapter() : RecyclerView.Adapter<VenuesAdapter.ViewHolder>() {
 
+    lateinit var myApp: MyApp // For di
     var items: MutableList<VenueItem> = mutableListOf()
         set(value) {
             value.sortBy { it.name }
@@ -26,7 +33,9 @@ class VenuesAdapter() : RecyclerView.Adapter<VenuesAdapter.ViewHolder>() {
             parent,
             false
         ) // To fill the full width: https://stackoverflow.com/a/30692398/905801
-        return ViewHolder(binding)
+        val viewHolder = ViewHolder(binding)
+        myApp.appComponent.inject(viewHolder)
+        return viewHolder
     }
 
     override fun getItemCount(): Int {
@@ -37,12 +46,23 @@ class VenuesAdapter() : RecyclerView.Adapter<VenuesAdapter.ViewHolder>() {
         holder.bind(items[position])
     }
 
-    inner class ViewHolder(val binding: VenueItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: VenueItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        @Inject
+        lateinit var photosService: PhotosService
 
         fun bind(item: VenueItem) {
             binding.venue = item
             binding.executePendingBindings()
             Timber.d("location: applying binding form item: ${item.name}")
+            photosService.getVenuePhotoUrl(item.id) { photoUrl ->
+                Timber.d("location: getting venues photo, and url is: $photoUrl")
+                Picasso.get()
+                    .load(photoUrl)
+                    .placeholder(R.drawable.photo_placeholder)
+                    .into(itemView.photoImageView)
+            }
         }
 
     }
