@@ -95,10 +95,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadNearbyFragment() {
+        val fragmentTag = "nearbyFrag"
+        if (supportFragmentManager.findFragmentByTag(fragmentTag) != null){
+            return // fragment is already added (probably device is just being rotated right now)
+        }
         supportFragmentManager.beginTransaction()
             .add(
                 R.id.fragmentContainer,
-                NearbyLocationsFragment()
+                NearbyLocationsFragment(),
+                fragmentTag
             )
             .commitAllowingStateLoss()
     }

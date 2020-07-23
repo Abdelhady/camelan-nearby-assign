@@ -15,7 +15,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.camelan_nearby_assign.MyApp
-import com.example.camelan_nearby_assign.R
+import com.example.camelan_nearby_assign.databinding.NearbyLocationsFragmentBinding
 import com.example.camelan_nearby_assign.ui.VenuesAdapter
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.nearby_locations_fragment.*
@@ -41,7 +41,11 @@ class NearbyLocationsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.nearby_locations_fragment, container, false)
+        val binding: NearbyLocationsFragmentBinding =
+            NearbyLocationsFragmentBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = requireActivity()
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

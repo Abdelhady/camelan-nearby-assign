@@ -17,13 +17,15 @@ class VenuesRepo @Inject constructor(
         latitude: Double,
         longitude: Double,
         radius: Int,
-        successCallback: (List<Venue>) -> Unit
+        successCallback: (List<Venue>) -> Unit,
+        errorCallback: () -> Unit
     ) {
         val ll = "${latitude},${longitude}"
         venuesService.getNearbyVenues(ll, radius)
             .enqueue(object : Callback<ExploreResponse> {
                 override fun onFailure(call: Call<ExploreResponse>, t: Throwable) {
                     Timber.d("location: getNearbyVenues onFailure")
+                    errorCallback()
                 }
 
                 override fun onResponse(
@@ -32,6 +34,7 @@ class VenuesRepo @Inject constructor(
                 ) {
                     if (!response.isSuccessful) {
                         Timber.d("location: getNearbyVenues is not successful")
+                        errorCallback()
                         return
                     }
                     Timber.d("location: getNearbyVenues is successful")

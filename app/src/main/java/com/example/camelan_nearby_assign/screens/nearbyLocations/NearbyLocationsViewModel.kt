@@ -13,7 +13,8 @@ class NearbyLocationsViewModel : ViewModel() {
     @Inject
     lateinit var venuesRepo: VenuesRepo
 
-    private val venues = MutableLiveData<List<Venue>>()
+    // Initiating with `emptyList()` to initiate `isEmpty()` as early as possible too
+    private val venues = MutableLiveData<List<Venue>>(emptyList())
     val venueItems = MediatorLiveData<List<VenueItem>>().apply {
         addSource(venues) {
             val items = arrayListOf<VenueItem>()
@@ -25,13 +26,35 @@ class NearbyLocationsViewModel : ViewModel() {
             value = items.toList()
         }
     }
+    val isEmpty = MediatorLiveData<Boolean>().apply {
+        addSource(venueItems) {
+            value = if (venueItems.value == null) {
+                true
+            } else {
+                venueItems.value!!.isEmpty()
+            }
+        }
+    }
+    val loading = MutableLiveData(true)
+    val hasError = MutableLiveData(false)
 
 
     fun refreshPlaces(latitude: Double, longitude: Double) {
-        // TODO handle returned value to be displayed in a recycler view
-        venuesRepo.getNearbyVenues(latitude, longitude, 500) {
-            venues.value = it
-        }
+        loading.value = true
+        hasError.value = false
+        venuesRepo.getNearbyVenues(
+            latitude,
+            longitude,
+            5000,
+            successCallback = {
+                venues.value = it
+                loading.value = false
+                hasError.value = false
+            },
+            errorCallback = {
+                loading.value = false
+                hasError.value = true
+            })
     }
 
 }
