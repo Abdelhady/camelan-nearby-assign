@@ -2,7 +2,7 @@ package com.example.camelan_nearby_assign.repos
 
 import com.example.camelan_nearby_assign.dataSource.FoursquareVenuesService
 import com.example.camelan_nearby_assign.dataSource.model.ExploreResponse
-import com.example.camelan_nearby_assign.dataSource.model.Venue
+import com.example.camelan_nearby_assign.dataSource.model.explore.Venue
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

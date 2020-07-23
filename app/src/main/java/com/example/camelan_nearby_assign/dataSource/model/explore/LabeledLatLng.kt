@@ -1,4 +1,4 @@
-package com.example.camelan_nearby_assign.dataSource.model
+package com.example.camelan_nearby_assign.dataSource.model.explore
 
 data class LabeledLatLng(
     val label: String,

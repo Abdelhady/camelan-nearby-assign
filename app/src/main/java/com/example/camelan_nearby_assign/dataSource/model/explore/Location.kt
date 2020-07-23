@@ -1,4 +1,6 @@
-package com.example.camelan_nearby_assign.dataSource.model
+package com.example.camelan_nearby_assign.dataSource.model.explore
+
+import com.example.camelan_nearby_assign.dataSource.model.explore.LabeledLatLng
 
 data class Location(
     val address: String,

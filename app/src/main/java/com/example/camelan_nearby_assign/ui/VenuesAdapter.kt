@@ -55,7 +55,7 @@ class VenuesAdapter() : RecyclerView.Adapter<VenuesAdapter.ViewHolder>() {
         fun bind(item: VenueItem) {
             binding.venue = item
             binding.executePendingBindings()
-            Timber.d("location: applying binding form item: ${item.name}")
+            Timber.d("location: applying binding for item with id: ${item.id}, & name: ${item.name}")
             photosService.getVenuePhotoUrl(item.id) { photoUrl ->
                 Timber.d("location: getting venues photo, and url is: $photoUrl")
                 Picasso.get()

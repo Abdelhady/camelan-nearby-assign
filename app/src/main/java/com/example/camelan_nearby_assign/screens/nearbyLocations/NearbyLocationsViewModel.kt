@@ -3,7 +3,7 @@ package com.example.camelan_nearby_assign.screens.nearbyLocations
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.camelan_nearby_assign.dataSource.model.Venue
+import com.example.camelan_nearby_assign.dataSource.model.explore.Venue
 import com.example.camelan_nearby_assign.repos.VenuesRepo
 import com.example.camelan_nearby_assign.ui.VenueItem
 import javax.inject.Inject
