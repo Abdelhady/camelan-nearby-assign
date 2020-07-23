@@ -3,4 +3,7 @@
     <string name="location_permission_note">To show you nearby locations, we need to access your location first</string>
     <string name="location_permission_button">OK, give permission</string>
     <string name="location_permission_declined_message">Please allow Location permission to show you nearby locations</string>
+    <string name="something_went_wrong">Something went wrong !!</string>
+    <string name="no_data_found">No data found !!</string>
+    <string name="please_wait">Please wait ...</string>
 </resources>

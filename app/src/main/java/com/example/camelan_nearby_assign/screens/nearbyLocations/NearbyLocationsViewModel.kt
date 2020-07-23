@@ -45,7 +45,7 @@ class NearbyLocationsViewModel : ViewModel() {
         venuesRepo.getNearbyVenues(
             latitude,
             longitude,
-            5000,
+            1000,
             successCallback = {
                 venues.value = it
                 loading.value = false
