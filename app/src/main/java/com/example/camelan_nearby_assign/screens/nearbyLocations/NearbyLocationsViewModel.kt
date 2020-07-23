@@ -13,12 +13,14 @@ class NearbyLocationsViewModel : ViewModel() {
     @Inject
     lateinit var venuesRepo: VenuesRepo
 
-    val venues = MutableLiveData<List<Venue>>()
+    private val venues = MutableLiveData<List<Venue>>()
     val venueItems = MediatorLiveData<List<VenueItem>>().apply {
         addSource(venues) {
             val items = arrayListOf<VenueItem>()
             for (venue in it) {
-                items.add(VenueItem(venue.name, "some address", "some photo url"))
+                val category = venue.categories?.get(0)?.name + " - "
+                val address = venue.location.formattedAddress.joinToString(", ")
+                items.add(VenueItem(venue.name, category + address, ""))
             }
             value = items.toList()
         }

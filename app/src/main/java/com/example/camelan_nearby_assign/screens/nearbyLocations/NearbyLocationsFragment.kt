@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.camelan_nearby_assign.MyApp
 import com.example.camelan_nearby_assign.R
@@ -52,13 +53,19 @@ class NearbyLocationsFragment : Fragment() {
             .inject(viewModel)
 
         fetchLastKnownLocation() // TODO most of the time, it returns null, is it worth using after all !
-        initLocationListener()
+        initLocationListener() // TODO it would be better to extract all location listening stuff to the activity, where fragment gets lat/long only
         initVenuesList()
     }
 
     private fun initVenuesList() {
         venuesRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         venuesRecyclerView.adapter = adapter
+        venuesRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                requireActivity(),
+                LinearLayoutManager.VERTICAL
+            )
+        ) // Showing a divider line: https://stackoverflow.com/a/54792091/905801
         viewModel.venueItems.observe(requireActivity()) {
             Timber.d("location: new venues has arrived to fragment, with size: ${it.size}")
             adapter.items = it.toMutableList()
