@@ -150,6 +150,13 @@ class MainActivity : AppCompatActivity() {
         isRealtime = !isRealtime
         updateRealtimeMenuItem(item)
         saveRealtimePref()
+        val toastMessage = if (isRealtime) {
+            R.string.realtime_activated_message
+        } else {
+            R.string.single_update_activated_message
+        }
+        Toast.makeText(this, toastMessage, Toast.LENGTH_LONG)
+            .show()
     }
 
     private fun updateRealtimeMenuItem(item: MenuItem) {
