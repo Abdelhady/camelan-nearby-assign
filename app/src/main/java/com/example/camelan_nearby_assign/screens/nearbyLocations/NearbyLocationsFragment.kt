@@ -85,7 +85,7 @@ class NearbyLocationsFragment : Fragment() {
                 if (locationResult.locations.size == 0) return
                 currentLocation = locationResult.locations[0]
                 Timber.d("current location details .. Longitude: ${currentLocation.longitude}, Latitude: ${currentLocation.latitude}")
-                // TODO refresh nearby locations list here
+                // TODO if not realtime mode & we fetched `currentLocation` before, then don't refresh
                 viewModel.refreshPlaces(currentLocation.latitude, currentLocation.longitude)
             }
         }

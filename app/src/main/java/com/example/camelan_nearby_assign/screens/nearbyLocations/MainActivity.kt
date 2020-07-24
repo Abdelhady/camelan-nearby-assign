@@ -2,11 +2,15 @@ package com.example.camelan_nearby_assign.screens.nearbyLocations
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -27,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private val mainViewModel by viewModels<MainViewModel>()
     private val REQUEST_CHECK_SETTINGS: Int = 1
     private var settingsDialogIsVisible = false
+    private var isRealtime = true
+    private val REALTIME_PREF_KEY = "realtime_pref_key"
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -46,11 +52,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: ActivityMainBinding =
-            DataBindingUtil.setContentView(this,
+            DataBindingUtil.setContentView(
+                this,
                 R.layout.activity_main
             )
         binding.viewmodel = mainViewModel
         binding.lifecycleOwner = this
+        readSavedRealtimePref()
         if (!mainViewModel.hasPermission.value!!) {
             checkLocationPermission()
         }
@@ -62,6 +70,53 @@ class MainActivity : AppCompatActivity() {
         settingsButton.setOnClickListener {
             ensureLocationSettingsEnabled()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.nearby_menu, menu)
+        updateRealtimeMenuItem(menu.findItem(R.id.realtime_option))
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.realtime_option -> {
+                toggleRealtimePreference(item)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun toggleRealtimePreference(item: MenuItem) {
+        isRealtime = !isRealtime
+        updateRealtimeMenuItem(item)
+        saveRealtimePref()
+    }
+
+    private fun updateRealtimeMenuItem(item: MenuItem) {
+        item.title = if (isRealtime)
+            getString(R.string.realtime)
+        else
+            getString(R.string.single_update)
+    }
+
+    /**
+     * Saving activity level preference:
+     * https://developer.android.com/training/data-storage/shared-preferences#WriteSharedPreference
+     */
+    private fun saveRealtimePref() {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        with(sharedPref.edit()) {
+            putBoolean(REALTIME_PREF_KEY, isRealtime)
+            commit()
+        }
+    }
+
+    private fun readSavedRealtimePref() {
+        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
+        isRealtime = sharedPref.getBoolean(REALTIME_PREF_KEY, true)
     }
 
     private fun checkLocationPermission() {
@@ -96,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNearbyFragment() {
         val fragmentTag = "nearbyFrag"
-        if (supportFragmentManager.findFragmentByTag(fragmentTag) != null){
+        if (supportFragmentManager.findFragmentByTag(fragmentTag) != null) {
             return // fragment is already added (probably device is just being rotated right now)
         }
         supportFragmentManager.beginTransaction()
