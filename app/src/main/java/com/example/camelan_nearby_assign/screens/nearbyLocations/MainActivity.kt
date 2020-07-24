@@ -299,6 +299,11 @@ class MainActivity : AppCompatActivity() {
         if (!isRealtime && currentLocation != null) {
             return
         }
+        val distanceInMeters = currentLocation?.distanceTo(newLocation)
+        Timber.d("distance to new location is: $distanceInMeters")
+        if (distanceInMeters != null && distanceInMeters < 500) {// TODO extract this distance in a constants file or something
+            return
+        }
         currentLocation = newLocation
         Timber.d("current location details .. Longitude: ${currentLocation!!.longitude}, Latitude: ${currentLocation!!.latitude}")
         nearbyFragmentViewModel.refreshPlaces(
