@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -15,9 +17,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.observe
+import com.example.camelan_nearby_assign.MyApp
 import com.example.camelan_nearby_assign.R
 import com.example.camelan_nearby_assign.databinding.ActivityMainBinding
 import com.google.android.gms.common.api.ResolvableApiException
@@ -29,10 +33,14 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
 
     private val mainViewModel by viewModels<MainViewModel>()
+    private val nearbyFragmentViewModel by viewModels<NearbyLocationsViewModel>()
     private val REQUEST_CHECK_SETTINGS: Int = 1
     private var settingsDialogIsVisible = false
     private var isRealtime = true
     private val REALTIME_PREF_KEY = "realtime_pref_key"
+    private lateinit var locationCallback: LocationCallback
+    private var currentLocation: Location? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -59,9 +67,58 @@ class MainActivity : AppCompatActivity() {
         binding.viewmodel = mainViewModel
         binding.lifecycleOwner = this
         readSavedRealtimePref()
-        if (!mainViewModel.hasPermission.value!!) {
+        (application as MyApp).appComponent
+            .nearbyLocationsComponent()
+            .create()
+            .inject(nearbyFragmentViewModel) // Injecting it here also, because activity may call it before using the fragment
+        if (!mainViewModel.hasPermission.value!!) {// `hasPermission` could be populated before, in case device is being rotated
             checkLocationPermission()
         }
+        initLocationSettingListeners()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fetchLastKnownLocation()
+        initLocationListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // TODO: Always listening to location updates is not efficient to device's battery when
+        // user is choosing only `Single Update` mode, so consider this when user changes Realtime Preference
+        startLocationUpdates()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Timber.d("location permission not exists")
+            return
+        }
+        // TODO extract interval/fastestInterval as separate constants to be used here & in the activity
+        val locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun initLocationSettingListeners() {
         mainViewModel.locationSettingEnabled.observe(this) {
             if (it) {
                 loadNearbyFragment()
@@ -225,6 +282,53 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun initLocationListener() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                Timber.d("locations found are ${locationResult.locations.size} locations")
+                if (locationResult.locations.size == 0) return
+                updateCurrentLocationIfNeeded(locationResult.locations[0])
+            }
+        }
+    }
+
+    private fun updateCurrentLocationIfNeeded(newLocation: Location) {
+        if (!isRealtime && currentLocation != null) {
+            return
+        }
+        currentLocation = newLocation
+        Timber.d("current location details .. Longitude: ${currentLocation!!.longitude}, Latitude: ${currentLocation!!.latitude}")
+        nearbyFragmentViewModel.refreshPlaces(
+            currentLocation!!.latitude,
+            currentLocation!!.longitude
+        )
+    }
+
+    private fun fetchLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // This shouldn't be reached, because activity is responsible for requesting the permission
+            Timber.d("location permission not exists")
+            return
+        }
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                // Got last known location. In some rare situations this can be null.
+                if (location != null) {
+                    updateCurrentLocationIfNeeded(location)
+                    Timber.d("last location details .. Longitude: ${location.longitude}, Latitude: ${location.latitude}")
+                } else {
+                    Timber.d("location is null")
+                    // This means that user didn't use any app that asks for location (like maps)
+                    // since last time the user enabled device's location setting
+                }
+            }
     }
 
 }
